@@ -1,0 +1,12 @@
+# Base de datos local para desarrollo: `docker compose up -d`
+services:
+  mongo:
+    image: mongo:7
+    container_name: op-jccv-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - op-jccv-data:/data/db
+
+volumes:
+  op-jccv-data:
