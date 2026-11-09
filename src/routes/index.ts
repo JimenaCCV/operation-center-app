@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as authController from "../controllers/auth.controller";
 import * as activityController from "../controllers/activity.controller";
 import * as planController from "../controllers/plan.controller";
+import * as summaryController from "../controllers/summary.controller";
 import { authenticate, requireRole } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate.middleware";
 import { asyncHandler } from "../utils/asyncHandler";
@@ -52,3 +53,6 @@ api.delete("/activities/:id/steps/:stepId", authenticate, asyncHandler(activityC
 // Feature 3 · Listar y planear pendientes
 api.get("/activities", authenticate, validate(listActivitiesQuerySchema, "query"), asyncHandler(activityController.list));
 api.get("/plan", authenticate, validate(planQuerySchema, "query"), asyncHandler(planController.getPlan));
+
+// Feature 5 · Resumen de carga
+api.get("/summary", authenticate, asyncHandler(summaryController.getSummary));
