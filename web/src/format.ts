@@ -77,6 +77,13 @@ export function nowInTz(now = new Date()): { hour: number; label: string } {
   return { hour: (Number(parts.hour) % 24) + Number(parts.minute) / 60, label: label.charAt(0).toUpperCase() + label.slice(1) };
 }
 
+/** Al revés que dateToDueAt: la fecha de entrega como "2026-11-20" (día en hora de México) para un <input type="date">. */
+export function dueAtToDate(iso: string | null): string {
+  if (!iso) return "";
+  // en-CA formatea como AAAA-MM-DD.
+  return new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(iso));
+}
+
 /** Un <input type="date"> da "2026-11-20"; la entrega se interpreta a las 23:59 hora de México. */
 export function dateToDueAt(date: string): string {
   return new Date(`${date}T23:59:00-06:00`).toISOString();

@@ -59,6 +59,33 @@ export interface SessionPlan {
   remaining: number;
 }
 
+export interface Summary {
+  total: number;
+  open: number;
+  byStatus: Record<Status, number>;
+  /** Solo actividades abiertas. */
+  byUrgency: Record<Urgency, number>;
+  pendingSteps: number;
+  remainingMin: number;
+  nextDue: { id: string; title: string; dueAt: string; urgency: Urgency } | null;
+}
+
+/** PATCH /api/activities/:id: al menos un campo; null quita el valor. */
+export interface UpdateActivityInput {
+  title?: string;
+  course?: string | null;
+  brief?: string | null;
+  dueAt?: string | null;
+  status?: "entregada" | "cancelada";
+}
+
+/** PATCH /api/activities/:id/steps/:stepId: al menos un campo. */
+export interface StepPatch {
+  done?: boolean;
+  text?: string;
+  estimateMin?: number;
+}
+
 export interface NewActivityInput {
   title: string;
   course?: string;

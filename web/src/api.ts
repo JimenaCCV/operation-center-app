@@ -1,4 +1,13 @@
-import type { Activity, ActivityList, NewActivityInput, SessionPlan, User } from "./types";
+import type {
+  Activity,
+  ActivityList,
+  NewActivityInput,
+  SessionPlan,
+  StepPatch,
+  Summary,
+  UpdateActivityInput,
+  User,
+} from "./types";
 
 const TOKEN_KEY = "op.token";
 
@@ -85,7 +94,19 @@ export const api = {
   listActivities: (f: ListFilters = {}) => request<ActivityList>("GET", `/activities${qs({ ...f })}`),
   getActivity: (id: string) => request<{ activity: Activity }>("GET", `/activities/${id}`),
   createActivity: (input: NewActivityInput) => request<{ activity: Activity }>("POST", "/activities", input),
+  updateActivity: (id: string, input: UpdateActivityInput) =>
+    request<{ activity: Activity }>("PATCH", `/activities/${id}`, input),
+  deleteActivity: (id: string) => request<null>("DELETE", `/activities/${id}`),
+
   setStep: (activityId: string, stepId: string, done: boolean) =>
     request<{ activity: Activity }>("PATCH", `/activities/${activityId}/steps/${stepId}`, { done }),
+  updateStep: (activityId: string, stepId: string, patch: StepPatch) =>
+    request<{ activity: Activity }>("PATCH", `/activities/${activityId}/steps/${stepId}`, patch),
+  addStep: (activityId: string, step: { text: string; estimateMin?: number }) =>
+    request<{ activity: Activity }>("POST", `/activities/${activityId}/steps`, step),
+  deleteStep: (activityId: string, stepId: string) =>
+    request<{ activity: Activity }>("DELETE", `/activities/${activityId}/steps/${stepId}`),
+
   plan: (minutes: number) => request<SessionPlan>("GET", `/plan${qs({ minutes })}`),
+  summary: () => request<Summary>("GET", "/summary"),
 };
