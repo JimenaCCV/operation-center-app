@@ -4,6 +4,7 @@ import { api, ApiError, type ListFilters } from "../api";
 import { ActivityCard } from "../components/ActivityCard";
 import { DayStrip } from "../components/DayStrip";
 import { Planner } from "../components/Planner";
+import { SummaryPanel } from "../components/SummaryPanel";
 import { STATUS_LABEL, URGENCY_LABEL } from "../format";
 import { STATUSES, URGENCIES, type Activity } from "../types";
 
@@ -16,7 +17,7 @@ export function HomePage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // Sube cada vez que un paso cambia, para que el plan se recalcule.
+  // Sube cada vez que un paso cambia, para que el plan y el resumen se recalculen.
   const [planKey, setPlanKey] = useState(0);
 
   useEffect(() => {
@@ -65,6 +66,7 @@ export function HomePage() {
   return (
     <>
       <DayStrip />
+      <SummaryPanel refreshKey={planKey} />
       <Planner refreshKey={planKey} />
 
       <section aria-label="Actividades" className="cards">
