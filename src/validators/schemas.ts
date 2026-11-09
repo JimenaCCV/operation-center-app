@@ -41,10 +41,38 @@ export const listActivitiesQuerySchema = z.object({
 });
 export type ListActivitiesQuery = z.infer<typeof listActivitiesQuerySchema>;
 
-export const setStepBodySchema = z.object({
-  done: z.boolean({ required_error: "done es obligatorio", invalid_type_error: "done debe ser true o false" }),
+/** Al menos un campo con valor (los campos desconocidos ya se descartaron). */
+const hasSomeField = (obj: Record<string, unknown>) => Object.values(obj).some((v) => v !== undefined);
+
+export const updateActivitySchema = z
+  .object({
+    title: z.string().trim().min(1, "El título es obligatorio").max(200).optional(),
+    course: z.union([z.null(), z.string().trim().min(1).max(100)]).optional(),
+    brief: z.union([z.null(), z.string().trim().max(2000)]).optional(),
+    // z.coerce.date() convierte null en 1970: el null se acepta aparte para «quitar la fecha».
+    dueAt: z.union([z.null(), z.coerce.date()]).optional(),
+    status: z.enum(["entregada", "cancelada"]).optional(),
+  })
+  .refine(hasSomeField, { message: "Envía al menos un campo: title, course, brief, dueAt o status" });
+export type UpdateActivityInput = z.infer<typeof updateActivitySchema>;
+
+const stepTextSchema = z.string().trim().min(1, "El texto del paso es obligatorio").max(300);
+const stepEstimateSchema = z.number().int().min(1).max(480);
+
+export const addStepSchema = z.object({
+  text: stepTextSchema,
+  estimateMin: stepEstimateSchema.optional(),
 });
-export type SetStepBody = z.infer<typeof setStepBodySchema>;
+export type AddStepInput = z.infer<typeof addStepSchema>;
+
+export const updateStepBodySchema = z
+  .object({
+    done: z.boolean({ invalid_type_error: "done debe ser true o false" }).optional(),
+    text: stepTextSchema.optional(),
+    estimateMin: stepEstimateSchema.optional(),
+  })
+  .refine(hasSomeField, { message: "Envía al menos un campo: done, text o estimateMin" });
+export type UpdateStepBody = z.infer<typeof updateStepBodySchema>;
 
 export const planQuerySchema = z.object({
   minutes: z.coerce.number().int().min(1).max(1440).default(30),

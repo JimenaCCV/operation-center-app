@@ -6,12 +6,14 @@ import { authenticate, requireRole } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate.middleware";
 import { asyncHandler } from "../utils/asyncHandler";
 import {
+  addStepSchema,
   createActivitySchema,
   listActivitiesQuerySchema,
   loginSchema,
   planQuerySchema,
   registerSchema,
-  setStepBodySchema,
+  updateActivitySchema,
+  updateStepBodySchema,
 } from "../validators/schemas";
 
 export const api = Router();
@@ -32,9 +34,20 @@ api.get("/activities/:id", authenticate, asyncHandler(activityController.getOne)
 api.patch(
   "/activities/:id/steps/:stepId",
   authenticate,
-  validate(setStepBodySchema, "body"),
-  asyncHandler(activityController.setStep),
+  validate(updateStepBodySchema, "body"),
+  asyncHandler(activityController.updateStep),
 );
+
+// Feature 4 · Edición y borrado de actividades y pasos
+api.patch(
+  "/activities/:id",
+  authenticate,
+  validate(updateActivitySchema, "body"),
+  asyncHandler(activityController.update),
+);
+api.delete("/activities/:id", authenticate, asyncHandler(activityController.remove));
+api.post("/activities/:id/steps", authenticate, validate(addStepSchema, "body"), asyncHandler(activityController.addStep));
+api.delete("/activities/:id/steps/:stepId", authenticate, asyncHandler(activityController.removeStep));
 
 // Feature 3 · Listar y planear pendientes
 api.get("/activities", authenticate, validate(listActivitiesQuerySchema, "query"), asyncHandler(activityController.list));

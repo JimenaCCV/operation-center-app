@@ -17,12 +17,32 @@ export async function getOne(req: Request, res: Response): Promise<void> {
   res.status(200).json({ activity });
 }
 
-export async function setStep(req: Request, res: Response): Promise<void> {
-  const activity = await activityService.setStepDone(
+export async function update(req: Request, res: Response): Promise<void> {
+  const activity = await activityService.updateActivity(req.user!.id, String(req.params.id), req.body);
+  res.status(200).json({ activity });
+}
+
+export async function remove(req: Request, res: Response): Promise<void> {
+  await activityService.deleteActivity(req.user!.id, String(req.params.id));
+  res.status(204).end();
+}
+
+export async function addStep(req: Request, res: Response): Promise<void> {
+  const activity = await activityService.addStep(req.user!.id, String(req.params.id), req.body);
+  res.status(201).json({ activity });
+}
+
+export async function updateStep(req: Request, res: Response): Promise<void> {
+  const activity = await activityService.updateStep(
     req.user!.id,
     String(req.params.id),
     String(req.params.stepId),
-    req.body.done,
+    req.body,
   );
+  res.status(200).json({ activity });
+}
+
+export async function removeStep(req: Request, res: Response): Promise<void> {
+  const activity = await activityService.deleteStep(req.user!.id, String(req.params.id), String(req.params.stepId));
   res.status(200).json({ activity });
 }
