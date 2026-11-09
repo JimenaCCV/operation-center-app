@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+.env
+.DS_Store
+*.local
+brief-entregable-2.md
+Proyecto_CentroDeOperacionesAI_Entregable1.pdf
