@@ -8,6 +8,9 @@ const schema = z.object({
   JWT_SECRET: z.string().min(16, "JWT_SECRET debe tener al menos 16 caracteres"),
   JWT_EXPIRES_IN: z.string().default("1h"),
   BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(10),
+  // Límite de intentos en /auth/login (solo fallidos) y /auth/register, por IP.
+  RATE_LIMIT_MAX: z.coerce.number().int().min(1).default(10),
+  RATE_LIMIT_WINDOW_MIN: z.coerce.number().int().min(1).max(1440).default(15),
 });
 
 const parsed = schema.safeParse(process.env);

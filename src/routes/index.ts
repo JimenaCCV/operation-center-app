@@ -3,7 +3,9 @@ import * as authController from "../controllers/auth.controller";
 import * as activityController from "../controllers/activity.controller";
 import * as planController from "../controllers/plan.controller";
 import * as summaryController from "../controllers/summary.controller";
+import { env } from "../config/env";
 import { authenticate, requireRole } from "../middleware/auth.middleware";
+import { createAuthLimiter, noLimit } from "../middleware/rate-limit.middleware";
 import { validate } from "../middleware/validate.middleware";
 import { asyncHandler } from "../utils/asyncHandler";
 import {
@@ -23,9 +25,15 @@ api.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
+// Feature 6 · Límite de intentos (desactivado en pruebas: las de API hacen muchos logins)
+const limiterOptions = { windowMs: env.RATE_LIMIT_WINDOW_MIN * 60_000, max: env.RATE_LIMIT_MAX };
+const loginLimiter =
+  env.NODE_ENV === "test" ? noLimit : createAuthLimiter({ ...limiterOptions, skipSuccessfulRequests: true });
+const registerLimiter = env.NODE_ENV === "test" ? noLimit : createAuthLimiter(limiterOptions);
+
 // Feature 1 · Autenticación y roles
-api.post("/auth/register", validate(registerSchema, "body"), asyncHandler(authController.register));
-api.post("/auth/login", validate(loginSchema, "body"), asyncHandler(authController.login));
+api.post("/auth/register", registerLimiter, validate(registerSchema, "body"), asyncHandler(authController.register));
+api.post("/auth/login", loginLimiter, validate(loginSchema, "body"), asyncHandler(authController.login));
 api.get("/auth/me", authenticate, asyncHandler(authController.me));
 api.get("/users", authenticate, requireRole("admin"), asyncHandler(authController.listUsers));
 
