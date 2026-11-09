@@ -102,8 +102,24 @@ textarea { resize: vertical; min-height: 70px; }
 .item .min { font: 12px var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
 .pager { display: flex; justify-content: space-between; align-items: center; }
 
-/* Editor de pasos (nueva actividad) */
+/* Editor de pasos (nueva actividad y detalle) */
 .stepedit { display: grid; grid-template-columns: 1fr 96px auto; gap: 8px; align-items: center; }
+.item.editable { grid-template-columns: 22px 1fr auto auto; }
+.acts { display: flex; gap: 6px; }
+
+/* Resumen de carga */
+.summary { display: grid; gap: 12px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; margin: 0; }
+.stats > div { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.stats dt { font-size: 12px; color: var(--muted); }
+.stats dd { margin: 0; font: 600 20px var(--f-display); font-variant-numeric: tabular-nums; }
+.stats .alert dd { color: var(--crit); }
+.nextdue { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: baseline; }
+
+/* Acciones del detalle */
+.btn.danger { background: var(--crit); border-color: var(--crit); color: #fff; }
+.btn.ghost.danger { background: transparent; color: var(--crit); }
+.confirm p { margin: 0 0 10px; }
 
 /* Tabla de usuarios */
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -111,5 +127,13 @@ textarea { resize: vertical; min-height: 70px; }
 .table th, .table td { padding: 8px 6px; border-bottom: 1px solid var(--line); }
 .table-wrap { overflow-x: auto; }
 
-@media (max-width: 520px) { .stepedit { grid-template-columns: 1fr 80px auto; } }
+@media (max-width: 520px) {
+  .stepedit { grid-template-columns: 1fr 80px auto; }
+  /* En el teléfono el formulario de edición del paso baja sus botones a una segunda línea. */
+  .items .stepedit { grid-template-columns: 1fr 72px; }
+  .items .stepedit .acts { grid-column: 1 / -1; }
+  /* Y en la fila del paso, los botones bajan debajo del texto (los minutos se quedan a la derecha). */
+  .item.editable { grid-template-columns: 22px 1fr auto; }
+  .item.editable .acts { grid-column: 2 / -1; }
+}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
