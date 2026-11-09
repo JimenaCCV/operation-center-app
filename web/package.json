@@ -1,0 +1,25 @@
+{
+  "name": "op-jccv-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Centro de Operaciones AI: front web (React + Vite + TypeScript) para la API op-jccv-api.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^6.30.6"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.6"
+  }
+}

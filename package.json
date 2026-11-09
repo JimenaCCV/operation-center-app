@@ -14,13 +14,15 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "seed": "tsx src/scripts/seed.ts",
-    "demo": "bash scripts/demo.sh"
+    "demo": "bash scripts/demo.sh",
+    "demo2": "bash scripts/demo2.sh"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "express-rate-limit": "^7.5.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.0",
     "zod": "^3.23.8"
