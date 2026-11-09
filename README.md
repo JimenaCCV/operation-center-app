@@ -117,7 +117,7 @@ tests/
   middleware/             Límite de intentos con una mini app (sin base de datos)
 scripts/demo.sh           Demostración con curl (Entregable 1)
 scripts/demo2.sh          Demostración con curl (Entregable 2)
-evidencia/                Salida de demo2 (evidencia del Entregable 2)
+evidencia/                Salida de demo2 y guion de capturas (Entregable 2)
 web/                      Front web (React + Vite), ver web/README.md
 ```
 
