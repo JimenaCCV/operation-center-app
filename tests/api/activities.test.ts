@@ -42,6 +42,13 @@ describe("POST /api/activities", () => {
     expect((await createActivity(token, { title: "A", steps: [{ text: "" }] })).status).toBe(400);
   });
 
+  it("dueAt booleano o arreglo → 400 (antes se guardaba como 1970-01-01)", async () => {
+    const { token } = await registerAndLogin();
+    for (const dueAt of [true, false, ["2026-12-01"]]) {
+      expect((await createActivity(token, { title: "x", dueAt })).status).toBe(400);
+    }
+  });
+
   it("el dueño siempre es quien tiene el token, aunque mande otro owner en el body", async () => {
     const a = await registerAndLogin();
     const b = await registerAndLogin();

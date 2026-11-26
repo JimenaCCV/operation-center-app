@@ -15,11 +15,19 @@ export const loginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 
+/**
+ * Fecha recibida en el body: texto (ISO 8601) o número (milisegundos).
+ * z.coerce.date() solo aceptaba también true/false y arreglos (true se guardaba como 1970-01-01).
+ */
+const dateInput = z
+  .union([z.string(), z.number()], { errorMap: () => ({ message: "La fecha debe ser texto ISO 8601 o número" }) })
+  .pipe(z.coerce.date());
+
 export const createActivitySchema = z.object({
   title: z.string().trim().min(1, "El título es obligatorio").max(200),
   course: z.string().trim().min(1).max(100).optional(),
   brief: z.string().trim().max(2000).optional(),
-  dueAt: z.coerce.date().optional(),
+  dueAt: dateInput.optional(),
   steps: z
     .array(
       z.object({
@@ -49,8 +57,8 @@ export const updateActivitySchema = z
     title: z.string().trim().min(1, "El título es obligatorio").max(200).optional(),
     course: z.union([z.null(), z.string().trim().min(1).max(100)]).optional(),
     brief: z.union([z.null(), z.string().trim().max(2000)]).optional(),
-    // z.coerce.date() convierte null en 1970: el null se acepta aparte para «quitar la fecha».
-    dueAt: z.union([z.null(), z.coerce.date()]).optional(),
+    // null se acepta aparte para «quitar la fecha» (convertido a fecha sería 1970).
+    dueAt: z.union([z.null(), dateInput]).optional(),
     status: z.enum(["entregada", "cancelada"]).optional(),
   })
   .refine(hasSomeField, { message: "Envía al menos un campo: title, course, brief, dueAt o status" });
