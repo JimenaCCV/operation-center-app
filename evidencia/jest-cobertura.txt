@@ -1,0 +1,29 @@
+
+> op-jccv-api@0.1.0 test:coverage
+> jest --runInBand --coverage --collectCoverageFrom=src/domain/**/*.ts
+
+PASS tests/api/activities.test.ts
+PASS tests/api/edit-delete.test.ts
+PASS tests/api/list-and-plan.test.ts
+PASS tests/api/auth.test.ts
+PASS tests/api/summary.test.ts
+PASS tests/middleware/rate-limit.test.ts
+PASS tests/domain/status-edit.test.ts
+PASS tests/domain/status-urgency.test.ts
+PASS tests/domain/summary.test.ts
+PASS tests/domain/planner.test.ts
+------------|---------|----------|---------|---------|-------------------
+File        | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+------------|---------|----------|---------|---------|-------------------
+All files   |   98.26 |       90 |     100 |   98.85 |                   
+ planner.ts |   95.23 |       75 |     100 |     100 | 46-54             
+ status.ts  |     100 |    93.33 |     100 |     100 | 27                
+ summary.ts |     100 |      100 |     100 |     100 |                   
+ urgency.ts |   95.23 |    88.88 |     100 |   94.11 | 32                
+------------|---------|----------|---------|---------|-------------------
+
+Test Suites: 10 passed, 10 total
+Tests:       115 passed, 115 total
+Snapshots:   0 total
+Time:        5.192 s
+Ran all test suites.
