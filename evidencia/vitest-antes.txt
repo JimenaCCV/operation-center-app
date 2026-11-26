@@ -1,0 +1,115 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v2.1.9 /Users/jimenaccv/Documents/GitHub/operation-center-app
+
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id > cambia título, materia, descripción y fecha (200) y recalcula la urgencia
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id > null quita la fecha, la materia y la descripción (no se vuelve 1970)
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id > al cambiar la fecha se actualiza el orden (dueSort)
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id > body vacío, solo campos desconocidos o tipos malos → 400
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id > sin token → 401
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id > ajena o inexistente → 404
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id > entregar con pasos pendientes → 409 con cuántos faltan
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id > entregar con todos los pasos hechos (200) y luego editarla → 409 cerrada
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id > cancelar se permite aunque tenga pasos pendientes
+ ✓ tests/api/edit-delete.test.ts > DELETE /api/activities/:id > borra (204 sin cuerpo) y después el GET da 404
+ ✓ tests/api/edit-delete.test.ts > DELETE /api/activities/:id > se puede borrar una actividad cerrada
+ ✓ tests/api/edit-delete.test.ts > DELETE /api/activities/:id > ajena o inexistente → 404 (y la ajena sigue existiendo); sin token → 401
+ ✓ tests/api/edit-delete.test.ts > POST /api/activities/:id/steps > agrega un paso (201); a una actividad lista la regresa a en_curso
+ ✓ tests/api/edit-delete.test.ts > POST /api/activities/:id/steps > sin estimateMin usa 15 minutos
+ ✓ tests/api/edit-delete.test.ts > POST /api/activities/:id/steps > texto vacío o minutos fuera de rango → 400
+ ✓ tests/api/edit-delete.test.ts > POST /api/activities/:id/steps > cerrada → 409; ajena → 404; sin token → 401
+ ✓ tests/api/edit-delete.test.ts > POST /api/activities/:id/steps > el paso 51 → 409
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id/steps/:stepId (ampliado) > edita texto y minutos (200) sin tocar done
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id/steps/:stepId (ampliado) > sigue aceptando { done: true } y rechazando { done: 'si' } o body vacío
+ ✓ tests/api/edit-delete.test.ts > PATCH /api/activities/:id/steps/:stepId (ampliado) > con la actividad cerrada: editar texto → 409, pero marcar/desmarcar sigue funcionando
+ ✓ tests/api/edit-delete.test.ts > DELETE /api/activities/:id/steps/:stepId > quita el paso (200) y recalcula: si los restantes están hechos pasa a lista
+ ✓ tests/api/edit-delete.test.ts > DELETE /api/activities/:id/steps/:stepId > si ya no quedan pasos vuelve a pendiente
+ ✓ tests/api/edit-delete.test.ts > DELETE /api/activities/:id/steps/:stepId > paso inexistente → 404; ajena → 404; cerrada → 409; sin token → 401
+ ✓ tests/api/list-and-plan.test.ts > GET /api/activities (listar con filtros) > lista solo las actividades del usuario, ordenadas por fecha y con «sin fecha» al final
+ ✓ tests/api/list-and-plan.test.ts > GET /api/activities (listar con filtros) > filtra por materia (sin importar mayúsculas), estado y urgencia
+ ✓ tests/api/list-and-plan.test.ts > GET /api/activities (listar con filtros) > pagina con limit y offset, y total refleja el filtro completo
+ ✓ tests/api/list-and-plan.test.ts > GET /api/activities (listar con filtros) > parámetros inválidos → 400; sin token → 401
+ ✓ tests/api/list-and-plan.test.ts > GET /api/plan (plan de sesión) > llena los minutos disponibles con los pasos de las entregas más cercanas
+ ✓ tests/api/list-and-plan.test.ts > GET /api/plan (plan de sesión) > no incluye actividades entregadas ni pasos hechos
+ ✓ tests/api/list-and-plan.test.ts > GET /api/plan (plan de sesión) > sin minutos usa 30 por defecto; minutos inválidos → 400; sin token → 401
+ ✓ tests/api/list-and-plan.test.ts > GET /api/plan (plan de sesión) > sin actividades devuelve un plan vacío (200)
+ ✓ tests/api/activities.test.ts > POST /api/activities > crea la actividad con sus pasos (201) y campos calculados
+ ✓ tests/api/activities.test.ts > POST /api/activities > sin token → 401
+ ✓ tests/api/activities.test.ts > POST /api/activities > título vacío, fecha inválida o paso sin texto → 400
+ ✓ tests/api/activities.test.ts > POST /api/activities > el dueño siempre es quien tiene el token, aunque mande otro owner en el body
+ ✓ tests/api/activities.test.ts > GET /api/activities/:id > devuelve la actividad (200)
+ ✓ tests/api/activities.test.ts > GET /api/activities/:id > id inexistente o mal formado → 404
+ ✓ tests/api/activities.test.ts > GET /api/activities/:id > la actividad de otra persona → 404 (no se revela que existe)
+ ✓ tests/api/activities.test.ts > PATCH /api/activities/:id/steps/:stepId > marcar pasos actualiza el progreso y el estado (pendiente → en_curso → lista)
+ ✓ tests/api/activities.test.ts > PATCH /api/activities/:id/steps/:stepId > done que no es booleano → 400
+ ✓ tests/api/activities.test.ts > PATCH /api/activities/:id/steps/:stepId > paso inexistente → 404; actividad ajena → 404
+ ✓ tests/api/auth.test.ts > POST /api/auth/register > crea la cuenta (201) y nunca devuelve el hash
+ ✓ tests/api/auth.test.ts > POST /api/auth/register > rechaza datos inválidos (400) con el detalle de cada campo
+ ✓ tests/api/auth.test.ts > POST /api/auth/register > rechaza un correo repetido (409), sin importar mayúsculas
+ ✓ tests/api/auth.test.ts > POST /api/auth/register > ignora un intento de registrarse como admin
+ ✓ tests/api/auth.test.ts > POST /api/auth/register > body que no es JSON → 400
+ ✓ tests/api/auth.test.ts > POST /api/auth/login > con credenciales correctas devuelve 200 y un JWT con el rol
+ ✓ tests/api/auth.test.ts > POST /api/auth/login > contraseña incorrecta y correo inexistente dan el mismo 401
+ ✓ tests/api/auth.test.ts > POST /api/auth/login > falta la contraseña → 400
+ ✓ tests/api/auth.test.ts > GET /api/auth/me y control de acceso > sin token → 401
+ ✓ tests/api/auth.test.ts > GET /api/auth/me y control de acceso > token con firma falsa → 401
+ ✓ tests/api/auth.test.ts > GET /api/auth/me y control de acceso > token válido → 200 con el usuario
+ ✓ tests/api/auth.test.ts > GET /api/auth/me y control de acceso > GET /api/users: usuario normal → 403, admin → 200
+ ✓ tests/domain/status-edit.test.ts > checkEditable > abierta se puede editar
+ ✓ tests/domain/status-edit.test.ts > checkEditable > entregada o cancelada no
+ ✓ tests/domain/status-edit.test.ts > checkClose > cancelar una abierta siempre se permite, aunque tenga pasos pendientes
+ ✓ tests/domain/status-edit.test.ts > checkClose > entregar sin pasos se permite
+ ✓ tests/domain/status-edit.test.ts > checkClose > entregar con todos los pasos hechos se permite
+ ✓ tests/domain/status-edit.test.ts > checkClose > entregar con 1 paso pendiente → dice cuántos faltan
+ ✓ tests/domain/status-edit.test.ts > checkClose > entregar con varios pendientes cuenta todos
+ ✓ tests/domain/status-edit.test.ts > checkClose > una actividad ya cerrada no se vuelve a cerrar
+ ✓ tests/domain/status-edit.test.ts > checkAddStep > permite agregar hasta llegar al máximo
+ ✓ tests/domain/status-edit.test.ts > checkAddStep > el paso 51 se rechaza
+ ✓ tests/domain/status-edit.test.ts > checkAddStep > cerrada se rechaza aunque tenga espacio
+ ✓ tests/domain/status-edit.test.ts > statusAfterStepEdit > sin pasos vuelve a pendiente
+ ✓ tests/domain/status-edit.test.ts > statusAfterStepEdit > agregar un paso a una actividad lista la regresa a en_curso
+ ✓ tests/domain/status-edit.test.ts > statusAfterStepEdit > si los pasos restantes están todos hechos pasa a lista
+ ✓ tests/domain/status-edit.test.ts > statusAfterStepEdit > con un solo paso pendiente se queda como estaba
+ ✓ tests/domain/status-edit.test.ts > statusAfterStepEdit > nunca cambia una actividad cerrada
+ ✓ tests/domain/summary.test.ts > summarize > sin actividades → todo en cero y nextDue null
+ ✓ tests/domain/summary.test.ts > summarize > mezcla de estados: byStatus cuenta todas; el trabajo, solo las abiertas
+ ✓ tests/domain/summary.test.ts > summarize > nextDue es la abierta con la fecha futura más cercana; ignora vencidas, sin fecha y cerradas
+ ✓ tests/domain/summary.test.ts > summarize > si solo hay vencidas o sin fecha, nextDue es null
+ ✓ tests/domain/summary.test.ts > summarize > borde de 24 h: 23.9 h es crítica, 24 h ya es pronto; una entrega justo ahora cuenta como siguiente
+ ✓ tests/api/summary.test.ts > GET /api/summary > resume datos creados con los otros endpoints (200)
+ ✓ tests/api/summary.test.ts > GET /api/summary > usuario sin actividades → 200 con todo en cero
+ ✓ tests/api/summary.test.ts > GET /api/summary > no mezcla actividades de otro usuario
+ ✓ tests/api/summary.test.ts > GET /api/summary > sin token → 401
+ ✓ tests/middleware/rate-limit.test.ts > createAuthLimiter > el intento 4 da 429 con Retry-After y el formato de error del proyecto
+ ✓ tests/middleware/rate-limit.test.ts > createAuthLimiter > en login los intentos exitosos no cuentan
+ ✓ tests/middleware/rate-limit.test.ts > createAuthLimiter > una vez bloqueado, ni la contraseña correcta pasa
+ ✓ tests/middleware/rate-limit.test.ts > createAuthLimiter > sin skipSuccessfulRequests (registro) cuentan todos los intentos
+ ✓ tests/domain/planner.test.ts > planSession > ordena por fecha de entrega más cercana
+ ✓ tests/domain/planner.test.ts > planSession > las actividades sin fecha van al final
+ ✓ tests/domain/planner.test.ts > planSession > llena el tiempo con pasos de otras actividades cuando el siguiente no cabe
+ ✓ tests/domain/planner.test.ts > planSession > no se salta pasos dentro de la misma actividad
+ ✓ tests/domain/planner.test.ts > planSession > siempre incluye al menos un paso aunque exceda el tiempo
+ ✓ tests/domain/planner.test.ts > planSession > ignora pasos hechos y actividades cerradas
+ ✓ tests/domain/planner.test.ts > planSession > con nada pendiente devuelve un plan vacío
+ ✓ tests/domain/planner.test.ts > planSession > calcula en qué minuto empieza cada paso
+ ✓ tests/domain/status-urgency.test.ts > urgency > a -1 horas de la entrega es vencida
+ ✓ tests/domain/status-urgency.test.ts > urgency > a 0 horas de la entrega es critica
+ ✓ tests/domain/status-urgency.test.ts > urgency > a 23.9 horas de la entrega es critica
+ ✓ tests/domain/status-urgency.test.ts > urgency > a 24 horas de la entrega es pronto
+ ✓ tests/domain/status-urgency.test.ts > urgency > a 71.9 horas de la entrega es pronto
+ ✓ tests/domain/status-urgency.test.ts > urgency > a 72 horas de la entrega es holgada
+ ✓ tests/domain/status-urgency.test.ts > urgency > sin fecha es sin_fecha
+ ✓ tests/domain/status-urgency.test.ts > urgency > urgencyRange coincide con urgency() en los bordes
+ ✓ tests/domain/status-urgency.test.ts > deriveStatus > todos los pasos hechos → lista
+ ✓ tests/domain/status-urgency.test.ts > deriveStatus > algunos hechos → en_curso
+ ✓ tests/domain/status-urgency.test.ts > deriveStatus > desmarcar un paso de una actividad lista la regresa a en_curso
+ ✓ tests/domain/status-urgency.test.ts > deriveStatus > nunca reabre una actividad entregada o cancelada
+ ✓ tests/domain/status-urgency.test.ts > deriveStatus > sin pasos conserva el estado
+ ✓ tests/domain/status-urgency.test.ts > helpers > isClosed
+ ✓ tests/domain/status-urgency.test.ts > helpers > remainingMinutes suma solo los pasos pendientes
+
+ Test Files  10 passed (10)
+      Tests  105 passed (105)
+   Start at  19:17:36
+   Duration  4.50s (transform 134ms, setup 0ms, collect 1.28s, tests 1.51s, environment 1ms, prepare 327ms)
+

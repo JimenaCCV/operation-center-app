@@ -1,5 +1,5 @@
 import request from "supertest";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import { Activity } from "../../src/models/activity.model";
 import { app, bearer, registerAndLogin, setupDb, teardownDb } from "./helpers";
 
@@ -61,7 +61,8 @@ describe("PATCH /api/activities/:id", () => {
     const a = await createActivity(token);
     for (const body of [{}, { owner: "otro", foo: 1 }, { title: "" }, { title: 5 }, { dueAt: "no-es-fecha" }, { status: "lista" }]) {
       const res = await patch(token, a.id, body);
-      expect(res.status, JSON.stringify(body)).toBe(400);
+      // Jest no acepta mensaje en expect: se compara junto con el body para saber cuál falló.
+      expect({ body, status: res.status }).toEqual({ body, status: 400 });
       expect(res.body.error.message).toBe("Datos inválidos");
     }
   });

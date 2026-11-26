@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@jest/globals";
 import { planSession, type PlannableActivity } from "../../src/domain/planner";
 
 const step = (id: string, estimateMin: number, done = false) => ({ id, text: `paso ${id}`, estimateMin, done });

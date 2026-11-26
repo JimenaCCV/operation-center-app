@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@jest/globals";
 import { deriveStatus, isClosed, remainingMinutes } from "../../src/domain/status";
 import { urgency, urgencyRange } from "../../src/domain/urgency";
 
