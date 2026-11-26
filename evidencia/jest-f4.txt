@@ -1,0 +1,67 @@
+PASS tests/api/edit-delete.test.ts
+  PATCH /api/activities/:id
+    ✓ HP-05: cambia título, materia, descripción y fecha (200) y recalcula la urgencia (60 ms)
+    ✓ ED-08: null quita la fecha, la materia y la descripción (no se vuelve 1970) (15 ms)
+    ✓ ED-09: al cambiar la fecha se actualiza el orden (dueSort) (28 ms)
+    ✓ ER-06: body vacío, solo campos desconocidos o tipos malos → 400 (16 ms)
+    ✓ ER-07: dueAt booleano o arreglo → 400 (antes se guardaba como 1970) (17 ms)
+    ✓ ER-08: sin token → 401 (1 ms)
+    ✓ ER-09: ajena o inexistente → 404 (24 ms)
+    ✓ ER-10: entregar con pasos pendientes → 409 con cuántos faltan (19 ms)
+    ✓ HP-06: entregar con todos los pasos hechos (200) y luego editarla → 409 cerrada (24 ms)
+    ✓ ED-10: cancelar se permite aunque tenga pasos pendientes (13 ms)
+    ✓ ED-11: entregar una actividad sin pasos → 200 (13 ms)
+    ✓ ED-12: título + entregar con pasos pendientes → 409 y no se guarda ningún cambio (19 ms)
+  DELETE /api/activities/:id
+    ✓ HP-07: borra (204 sin cuerpo) y después el GET da 404 (20 ms)
+    ✓ ED-13: se puede borrar una actividad cerrada (17 ms)
+    ✓ ER-11: ajena o inexistente → 404 (y la ajena sigue existiendo); sin token → 401 (25 ms)
+  POST /api/activities/:id/steps
+    ✓ HP-08: agrega un paso (201); a una actividad lista la regresa a en_curso (19 ms)
+    ✓ ED-14: sin estimateMin usa 15 minutos (18 ms)
+    ✓ ER-12: texto vacío o minutos fuera de rango → 400 (15 ms)
+    ✓ ER-13: cerrada → 409; ajena → 404; sin token → 401 (45 ms)
+    ✓ ER-14: el paso 51 → 409 (36 ms)
+    ✓ ED-15: con 49 pasos, el paso 50 sí se agrega (201) (34 ms)
+    ✓ ED-16: límites al agregar: texto de 300 y minutos 1 y 480 sí; texto de 301 no (36 ms)
+    ✓ ER-15: texto de solo espacios o minutos con decimales → 400 (21 ms)
+  PATCH /api/activities/:id/steps/:stepId (ampliado)
+    ✓ HP-09: edita texto y minutos (200) sin tocar done (23 ms)
+    ✓ ER-16: sigue aceptando { done: true } y rechazando { done: 'si' } o body vacío (61 ms)
+    ✓ ED-17: con la actividad cerrada: editar texto → 409, pero marcar/desmarcar sigue funcionando (21 ms)
+    ✓ ER-17: paso inexistente o de otra actividad → 404 «Paso no encontrado» (16 ms)
+    ✓ ED-18: límites al editar un paso: texto 300 y minutos 1/480 sí; 301, 0 y 481 no (20 ms)
+  DELETE /api/activities/:id/steps/:stepId
+    ✓ HP-10: quita el paso (200) y recalcula: si los restantes están hechos pasa a lista (19 ms)
+    ✓ ED-19: si ya no quedan pasos vuelve a pendiente (16 ms)
+    ✓ ER-18: paso inexistente → 404; ajena → 404; cerrada → 409; sin token → 401 (25 ms)
+  ids mal formados en las rutas de la feature
+    ✓ ER-19: :id o :stepId que no es ObjectId → 404 en JSON (nunca 500) (18 ms)
+
+PASS tests/domain/status-edit.test.ts
+  checkEditable
+    ✓ HP-01: abierta se puede editar
+    ✓ ER-01: entregada o cancelada no (1 ms)
+  checkClose
+    ✓ ED-01: cancelar una abierta siempre se permite, aunque tenga pasos pendientes
+    ✓ ED-02: entregar sin pasos se permite
+    ✓ HP-02: entregar con todos los pasos hechos se permite
+    ✓ ER-02: entregar con 1 paso pendiente → dice cuántos faltan
+    ✓ ER-03: entregar con varios pendientes cuenta todos
+    ✓ ER-04: una actividad ya cerrada no se vuelve a cerrar
+  checkAddStep
+    ✓ ED-03: permite agregar hasta llegar al máximo (el paso 50 sí)
+    ✓ ED-04: el paso 51 se rechaza
+    ✓ ER-05: cerrada se rechaza aunque tenga espacio (1 ms)
+  statusAfterStepEdit
+    ✓ ED-05: sin pasos vuelve a pendiente
+    ✓ ED-06: agregar un paso a una actividad lista la regresa a en_curso
+    ✓ HP-03: si los pasos restantes están todos hechos pasa a lista
+    ✓ HP-04: con un solo paso pendiente se queda como estaba
+    ✓ ED-07: nunca cambia una actividad cerrada
+
+Test Suites: 2 passed, 2 total
+Tests:       48 passed, 48 total
+Snapshots:   0 total
+Time:        2.531 s, estimated 3 s
+Ran all test suites matching /tests\/domain\/status-edit.test.ts|tests\/api\/edit-delete.test.ts/i.

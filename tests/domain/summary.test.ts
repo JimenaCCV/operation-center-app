@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@jest/globals";
 import type { ActivityStatus } from "../../src/domain/status";
 import { summarize, type SummaryActivity } from "../../src/domain/summary";
 

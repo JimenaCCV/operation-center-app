@@ -2,7 +2,7 @@
 
 Backend (Node.js + Express + TypeScript + MongoDB/Mongoose) para organizar actividades escolares: cada actividad tiene pasos con tiempo estimado, y la API arma un plan de sesión según los minutos que tengas disponibles.
 
-Proyecto integrador del curso *Tecnologías de desarrollo en el servidor* (ITESO). Este repositorio contiene el Entregable 1 (features 1–3) y el Entregable 2 (features 4–6), además de un front web sencillo en [`web/`](web/README.md).
+Proyecto integrador del curso *Tecnologías de desarrollo en el servidor* (ITESO). Este repositorio contiene el Entregable 1 (features 1–3), el Entregable 2 (features 4–6) y el **cierre técnico del Entregable 4**: pruebas migradas a Jest, la feature 4 probada con casos de happy path, error y borde, defectos corregidos y evidencia en [`evidencia/`](evidencia/). Incluye un front web sencillo en [`web/`](web/README.md).
 
 ## Problema y usuarios
 
@@ -60,7 +60,9 @@ npm run demo     # Entregable 1: features 1–3
 npm run demo2
 ```
 
-La salida de `demo2` de referencia está en [`evidencia/demo2-salida.txt`](evidencia/demo2-salida.txt).
+La salida de referencia de los dos scripts está en [`evidencia/final-demo-salida.txt`](evidencia/final-demo-salida.txt) (Entregable 4) y [`evidencia/demo2-salida.txt`](evidencia/demo2-salida.txt) (Entregable 2).
+
+Para el video hay un recorrido con pausas entre pasos: `bash scripts/demo-video.sh` (ver [`evidencia/GUION-VIDEO.md`](evidencia/GUION-VIDEO.md)).
 
 ### Variables de entorno
 
@@ -83,7 +85,9 @@ Con `NODE_ENV=test` (las pruebas) el límite de intentos de la app está desacti
 |---------|----------|
 | `npm run dev` | Servidor con recarga (tsx watch) |
 | `npm run build` / `npm start` | Compila a `dist/` y ejecuta |
-| `npm test` | Pruebas (vitest). Las de API necesitan MongoDB; usan la base `op-jccv-test` o `MONGODB_TEST_URI` |
+| `npm test` | Pruebas con Jest (`--runInBand`). Las de API necesitan MongoDB; usan la base `op-jccv-test` o `MONGODB_TEST_URI` |
+| `npm run test:verbose` | Igual, con el nombre de cada prueba |
+| `npm run test:coverage` | Pruebas con cobertura de las reglas puras (`src/domain`) |
 | `npm run typecheck` | Verifica tipos sin compilar |
 | `npm run seed` | Crea un administrador con `ADMIN_EMAIL` / `ADMIN_PASSWORD` |
 | `npm run demo` | Recorre las features 1–3 con `curl` |
@@ -114,10 +118,13 @@ src/
 tests/
   domain/                 Pruebas de reglas puras (sin base de datos)
   api/                    Pruebas de endpoints con supertest
-  middleware/             Límite de intentos con una mini app (sin base de datos)
+  middleware/             Límite de intentos y errores globales (sin base de datos)
+  setup-env.ts            Variables de entorno de prueba (Jest las carga antes de cada archivo)
+jest.config.js            Configuración de Jest (ts-jest)
 scripts/demo.sh           Demostración con curl (Entregable 1)
 scripts/demo2.sh          Demostración con curl (Entregable 2)
-evidencia/                Salida de demo2 y guion de capturas (Entregable 2)
+scripts/demo-video.sh     Recorrido con pausas para grabar el video (Entregable 4)
+evidencia/                Salidas de pruebas y demos, tabla de casos y guiones (Entregables 2 y 4)
 web/                      Front web (React + Vite), ver web/README.md
 ```
 
@@ -147,7 +154,9 @@ Todas las rutas cuelgan de `/api`. Las marcadas con 🔒 requieren `Authorizatio
 | GET | `/api/plan?minutes=N` 🔒 | Plan de sesión para N minutos | 200, 400, 401 |
 | GET ★ | `/api/summary` 🔒 | Resumen de carga del usuario | 200, 401 |
 
-Una actividad ajena o inexistente siempre responde 404. Un body vacío o solo con campos desconocidos en los PATCH responde 400.
+Una actividad ajena, inexistente o con id mal formado siempre responde 404. Un body vacío o solo con campos desconocidos en los PATCH responde 400. `dueAt` acepta texto ISO 8601 o número (y `null` en el PATCH); `true`, `false` o un arreglo responden 400.
+
+Errores comunes a todas las rutas: JSON mal formado → 400, body de más de 100 kb → 413, charset o `Content-Encoding` no soportado → 415, ruta o método inexistente → 404, error interno → 500 con mensaje genérico (sin stack). Siempre en el formato `{ "error": { "message", "details?" } }`.
 
 ### Ejemplo: entregar con pasos pendientes
 
@@ -206,13 +215,32 @@ curl 'http://localhost:3000/api/plan?minutes=25' -H "Authorization: Bearer $TOKE
 - **Estado** (se deriva de los pasos): todos hechos -> `lista`; algunos -> `en_curso`. Una actividad `entregada` o `cancelada` nunca se reabre.
 - **Plan de sesión**: ordena por fecha de entrega (sin fecha, al final), respeta el orden de los pasos de cada actividad y llena el tiempo con pasos de otras actividades cuando el siguiente no cabe. Siempre incluye al menos un paso.
 
-Entregable 2 (`src/domain/status.ts` y `src/domain/summary.ts`, funciones puras probadas con vitest):
+Entregable 2 (`src/domain/status.ts` y `src/domain/summary.ts`, funciones puras probadas con Jest):
 
 - **Actividad cerrada** (`entregada` o `cancelada`): no se editan sus datos ni se agregan, editan o quitan pasos (409 «La actividad está cerrada y no se puede modificar»). Sí se puede marcar o desmarcar un paso y borrar la actividad entera.
 - **Cerrar a mano** (`checkClose`): `cancelada` siempre que esté abierta; `entregada` solo si no quedan pasos pendientes (o no tiene pasos). Si no, 409 «Faltan N paso(s) por completar».
 - **Estado al agregar o quitar pasos** (`statusAfterStepEdit`): sin pasos vuelve a `pendiente`; si no, se deriva de los pasos (agregar un paso a una actividad `lista` la regresa a `en_curso`; si los que quedan están todos hechos, pasa a `lista`).
 - **Máximo 50 pasos** por actividad: el 51.º responde 409.
 - **Resumen** (`summarize`): `byStatus` cuenta todas las actividades; `byUrgency`, `pendingSteps` y `remainingMin`, solo las abiertas. `nextDue` es la abierta con la fecha futura más cercana; las vencidas y las que no tienen fecha no cuentan.
+
+## Pruebas (Jest)
+
+```bash
+docker compose up -d        # MongoDB para las pruebas de API (o define MONGODB_TEST_URI)
+npm test                    # 11 suites, 120 pruebas
+npm run test:verbose        # con el nombre de cada prueba
+npm run test:coverage       # cobertura de src/domain
+```
+
+- **Herramientas:** Jest 29 con ts-jest, supertest para las rutas y una base MongoDB de prueba (`op-jccv-test`) que se vacía al inicio y al final de cada archivo. Los archivos corren en serie (`--runInBand`) porque comparten esa base.
+- **Feature seleccionada para testing:** Feature 4, *edición, cierre y borrado de actividades y pasos*. Tiene 48 casos con ID: 10 de happy path (HP), 19 de error (ER) y 19 de borde (ED). Están en `tests/domain/status-edit.test.ts` y `tests/api/edit-delete.test.ts`. La tabla completa está en [`evidencia/CASOS-F4.md`](evidencia/CASOS-F4.md).
+- Para correr solo la feature: `npx jest --runInBand --verbose tests/domain/status-edit.test.ts tests/api/edit-delete.test.ts`.
+- **Regresión:** antes de la migración, vitest daba 105 pruebas en 10 archivos ([`evidencia/vitest-antes.txt`](evidencia/vitest-antes.txt)). Las mismas 105 pasan en Jest ([`evidencia/jest-regresion.txt`](evidencia/jest-regresion.txt)). Después se agregaron 15: 9 de la feature 4, 1 del defecto de `dueAt` en `POST /api/activities` y 5 de errores globales.
+- **Cobertura de `src/domain`:** 98.26 % de sentencias y 90 % de ramas ([`evidencia/jest-cobertura.txt`](evidencia/jest-cobertura.txt)).
+
+## Demo en video
+
+VIDEO_URL_PENDIENTE
 
 ## Seguridad
 

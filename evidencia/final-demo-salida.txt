@@ -1,0 +1,962 @@
+########## npm run demo  (2026-11-26 07:21)
+
+> op-jccv-api@0.1.0 demo
+> bash scripts/demo.sh
+
+Servidor: http://localhost:3000
+
+=== Health check
+$ curl -X GET 'http://localhost:3000/api/health'
+HTTP 200
+{
+  "status": "ok"
+}
+
+=== F1 · Registro
+$ curl -X POST 'http://localhost:3000/api/auth/register' -H 'Content-Type: application/json' -d '{"name":"Ana Demo","email":"demo1795699281@example.com","password":"contrasena-demo-1"}'
+HTTP 201
+{
+  "user": {
+    "name": "Ana Demo",
+    "email": "demo1795699281@example.com",
+    "role": "user",
+    "createdAt": "2026-11-26T13:21:21.262Z",
+    "updatedAt": "2026-11-26T13:21:21.262Z",
+    "id": "6b08325141227f20e185bafd"
+  }
+}
+
+=== F1 · Registro con correo repetido (409)
+$ curl -X POST 'http://localhost:3000/api/auth/register' -H 'Content-Type: application/json' -d '{"name":"Ana Demo","email":"demo1795699281@example.com","password":"contrasena-demo-1"}'
+HTTP 409
+{
+  "error": {
+    "message": "Ese correo ya está registrado"
+  }
+}
+
+=== F1 · Login
+$ curl -X POST 'http://localhost:3000/api/auth/login' -H 'Content-Type: application/json' -d '{"email":"demo1795699281@example.com","password":"contrasena-demo-1"}'
+HTTP 200
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5...",
+  "user": {
+    "name": "Ana Demo",
+    "email": "demo1795699281@example.com",
+    "role": "user",
+    "createdAt": "2026-11-26T13:21:21.262Z",
+    "updatedAt": "2026-11-26T13:21:21.262Z",
+    "id": "6b08325141227f20e185bafd"
+  }
+}
+
+=== F1 · Login con contraseña incorrecta (401)
+$ curl -X POST 'http://localhost:3000/api/auth/login' -H 'Content-Type: application/json' -d '{"email":"demo1795699281@example.com","password":"incorrecta-123"}'
+HTTP 401
+{
+  "error": {
+    "message": "Credenciales inválidas"
+  }
+}
+
+=== F1 · Ruta de admin con usuario normal (403)
+$ curl -X GET 'http://localhost:3000/api/users' -H 'Authorization: Bearer <TOKEN>'
+HTTP 403
+{
+  "error": {
+    "message": "No tienes permisos para esta operación"
+  }
+}
+
+=== F2 · Crear actividad con pasos
+$ curl -X POST 'http://localhost:3000/api/activities' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"title":"Entregable 1","course":"Tecnologías en el servidor","dueAt":"2026-11-26T23:21:21.939Z","steps":[{"text":"Definir features","estimateMin":30},{"text":"Escribir README","estimateMin":20}]}'
+HTTP 201
+{
+  "activity": {
+    "owner": "6b08325141227f20e185bafd",
+    "title": "Entregable 1",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-26T23:21:21.939Z",
+    "status": "pendiente",
+    "steps": [
+      {
+        "text": "Definir features",
+        "estimateMin": 30,
+        "done": false,
+        "doneAt": null,
+        "id": "6b08325241227f20e185bb03"
+      },
+      {
+        "text": "Escribir README",
+        "estimateMin": 20,
+        "done": false,
+        "doneAt": null,
+        "id": "6b08325241227f20e185bb04"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:22.016Z",
+    "updatedAt": "2026-11-26T13:21:22.016Z",
+    "id": "6b08325241227f20e185bb02",
+    "urgency": "critica",
+    "remainingMin": 50,
+    "progress": {
+      "done": 0,
+      "total": 2
+    }
+  }
+}
+
+=== F2 · Crear segunda actividad
+$ curl -X POST 'http://localhost:3000/api/activities' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"title":"Lectura de Bioética","course":"Bioética","dueAt":"2026-12-01T13:21:22.001Z","steps":[{"text":"Leer capítulo 3","estimateMin":25}]}'
+HTTP 201
+{
+  "activity": {
+    "owner": "6b08325141227f20e185bafd",
+    "title": "Lectura de Bioética",
+    "course": "Bioética",
+    "brief": null,
+    "dueAt": "2026-12-01T13:21:22.001Z",
+    "status": "pendiente",
+    "steps": [
+      {
+        "text": "Leer capítulo 3",
+        "estimateMin": 25,
+        "done": false,
+        "doneAt": null,
+        "id": "6b08325241227f20e185bb07"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:22.236Z",
+    "updatedAt": "2026-11-26T13:21:22.236Z",
+    "id": "6b08325241227f20e185bb06",
+    "urgency": "holgada",
+    "remainingMin": 25,
+    "progress": {
+      "done": 0,
+      "total": 1
+    }
+  }
+}
+
+=== F2 · Consultar una actividad
+$ curl -X GET 'http://localhost:3000/api/activities/6b08325241227f20e185bb02' -H 'Authorization: Bearer <TOKEN>'
+HTTP 200
+{
+  "activity": {
+    "owner": "6b08325141227f20e185bafd",
+    "title": "Entregable 1",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-26T23:21:21.939Z",
+    "status": "pendiente",
+    "steps": [
+      {
+        "text": "Definir features",
+        "estimateMin": 30,
+        "done": false,
+        "doneAt": null,
+        "id": "6b08325241227f20e185bb03"
+      },
+      {
+        "text": "Escribir README",
+        "estimateMin": 20,
+        "done": false,
+        "doneAt": null,
+        "id": "6b08325241227f20e185bb04"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:22.016Z",
+    "updatedAt": "2026-11-26T13:21:22.016Z",
+    "id": "6b08325241227f20e185bb02",
+    "urgency": "critica",
+    "remainingMin": 50,
+    "progress": {
+      "done": 0,
+      "total": 2
+    }
+  }
+}
+
+=== F2 · Marcar un paso como hecho
+$ curl -X PATCH 'http://localhost:3000/api/activities/6b08325241227f20e185bb02/steps/6b08325241227f20e185bb03' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"done":true}'
+HTTP 200
+{
+  "activity": {
+    "owner": "6b08325141227f20e185bafd",
+    "title": "Entregable 1",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-26T23:21:21.939Z",
+    "status": "en_curso",
+    "steps": [
+      {
+        "text": "Definir features",
+        "estimateMin": 30,
+        "done": true,
+        "doneAt": "2026-11-26T13:21:22.402Z",
+        "id": "6b08325241227f20e185bb03"
+      },
+      {
+        "text": "Escribir README",
+        "estimateMin": 20,
+        "done": false,
+        "doneAt": null,
+        "id": "6b08325241227f20e185bb04"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:22.016Z",
+    "updatedAt": "2026-11-26T13:21:22.402Z",
+    "id": "6b08325241227f20e185bb02",
+    "urgency": "critica",
+    "remainingMin": 20,
+    "progress": {
+      "done": 1,
+      "total": 2
+    }
+  }
+}
+
+=== F2 · Actividad inexistente (404)
+$ curl -X GET 'http://localhost:3000/api/activities/64b7f0f0f0f0f0f0f0f0f0f0' -H 'Authorization: Bearer <TOKEN>'
+HTTP 404
+{
+  "error": {
+    "message": "Actividad no encontrada"
+  }
+}
+
+=== F3 · Listar con filtro de materia
+$ curl -X GET 'http://localhost:3000/api/activities?course=Bio%C3%A9tica&limit=10' -H 'Authorization: Bearer <TOKEN>'
+HTTP 200
+{
+  "activities": [
+    {
+      "owner": "6b08325141227f20e185bafd",
+      "title": "Lectura de Bioética",
+      "course": "Bioética",
+      "brief": null,
+      "dueAt": "2026-12-01T13:21:22.001Z",
+      "status": "pendiente",
+      "steps": [
+        {
+          "text": "Leer capítulo 3",
+          "estimateMin": 25,
+          "done": false,
+          "doneAt": null,
+          "id": "6b08325241227f20e185bb07"
+        }
+      ],
+      "createdAt": "2026-11-26T13:21:22.236Z",
+      "updatedAt": "2026-11-26T13:21:22.236Z",
+      "id": "6b08325241227f20e185bb06",
+      "urgency": "holgada",
+      "remainingMin": 25,
+      "progress": {
+        "done": 0,
+        "total": 1
+      }
+    }
+  ],
+  "total": 1,
+  "limit": 10,
+  "offset": 0
+}
+
+=== F3 · Listar con filtro de urgencia
+$ curl -X GET 'http://localhost:3000/api/activities?urgency=critica' -H 'Authorization: Bearer <TOKEN>'
+HTTP 200
+{
+  "activities": [
+    {
+      "owner": "6b08325141227f20e185bafd",
+      "title": "Entregable 1",
+      "course": "Tecnologías en el servidor",
+      "brief": null,
+      "dueAt": "2026-11-26T23:21:21.939Z",
+      "status": "en_curso",
+      "steps": [
+        {
+          "text": "Definir features",
+          "estimateMin": 30,
+          "done": true,
+          "doneAt": "2026-11-26T13:21:22.402Z",
+          "id": "6b08325241227f20e185bb03"
+        },
+        {
+          "text": "Escribir README",
+          "estimateMin": 20,
+          "done": false,
+          "doneAt": null,
+          "id": "6b08325241227f20e185bb04"
+        }
+      ],
+      "createdAt": "2026-11-26T13:21:22.016Z",
+      "updatedAt": "2026-11-26T13:21:22.402Z",
+      "id": "6b08325241227f20e185bb02",
+      "urgency": "critica",
+      "remainingMin": 20,
+      "progress": {
+        "done": 1,
+        "total": 2
+      }
+    }
+  ],
+  "total": 1,
+  "limit": 20,
+  "offset": 0
+}
+
+=== F3 · Plan para una sesión de 25 minutos
+$ curl -X GET 'http://localhost:3000/api/plan?minutes=25' -H 'Authorization: Bearer <TOKEN>'
+HTTP 200
+{
+  "minutes": 25,
+  "steps": [
+    {
+      "activityId": "6b08325241227f20e185bb02",
+      "activityTitle": "Entregable 1",
+      "stepId": "6b08325241227f20e185bb04",
+      "text": "Escribir README",
+      "estimateMin": 20,
+      "startsAtMin": 0
+    }
+  ],
+  "totalMin": 20,
+  "remaining": 1
+}
+
+=== F3 · Sin token (401)
+$ curl -X GET 'http://localhost:3000/api/activities'
+HTTP 401
+{
+  "error": {
+    "message": "Falta el token: envía Authorization: Bearer <token>"
+  }
+}
+
+Listo.
+
+########## RATE_LIMIT_MAX=5 npm run demo2  (2026-11-26 07:21)
+
+> op-jccv-api@0.1.0 demo2
+> bash scripts/demo2.sh
+
+Servidor: http://localhost:3000
+
+=== Health check
+$ curl -X GET 'http://localhost:3000/api/health'
+HTTP 200
+{
+  "status": "ok"
+}
+
+=== 1 · Registro
+$ curl -X POST 'http://localhost:3000/api/auth/register' -H 'Content-Type: application/json' -d '{"name":"Jimena Demo","email":"demo2-1795699286@example.com","password":"contrasena-demo-2"}'
+HTTP 201
+{
+  "user": {
+    "name": "Jimena Demo",
+    "email": "demo2-1795699286@example.com",
+    "role": "user",
+    "createdAt": "2026-11-26T13:21:26.329Z",
+    "updatedAt": "2026-11-26T13:21:26.329Z",
+    "id": "6b083256a2eb6ec268e1a55a"
+  }
+}
+
+=== 1 · Login
+$ curl -X POST 'http://localhost:3000/api/auth/login' -H 'Content-Type: application/json' -d '{"email":"demo2-1795699286@example.com","password":"contrasena-demo-2"}'
+HTTP 200
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5...",
+  "user": {
+    "name": "Jimena Demo",
+    "email": "demo2-1795699286@example.com",
+    "role": "user",
+    "createdAt": "2026-11-26T13:21:26.329Z",
+    "updatedAt": "2026-11-26T13:21:26.329Z",
+    "id": "6b083256a2eb6ec268e1a55a"
+  }
+}
+
+=== 2 · Crear actividad con 3 pasos (201)
+$ curl -X POST 'http://localhost:3000/api/activities' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"title":"Entregable 2","course":"Tecnologías en el servidor","dueAt":"2026-12-01T13:21:26.694Z","steps":[{"text":"Leer la rúbrica","estimateMin":15},{"text":"Programar endpoints","estimateMin":60},{"text":"Escribir el reporte","estimateMin":40}]}'
+HTTP 201
+{
+  "activity": {
+    "owner": "6b083256a2eb6ec268e1a55a",
+    "title": "Entregable 2",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-12-01T13:21:26.694Z",
+    "status": "pendiente",
+    "steps": [
+      {
+        "text": "Leer la rúbrica",
+        "estimateMin": 15,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a55e"
+      },
+      {
+        "text": "Programar endpoints",
+        "estimateMin": 60,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a55f"
+      },
+      {
+        "text": "Escribir el reporte",
+        "estimateMin": 40,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a560"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:26.710Z",
+    "updatedAt": "2026-11-26T13:21:26.710Z",
+    "id": "6b083256a2eb6ec268e1a55d",
+    "urgency": "holgada",
+    "remainingMin": 115,
+    "progress": {
+      "done": 0,
+      "total": 3
+    }
+  }
+}
+
+=== 3 · F4 · Editar título y fecha (200)
+$ curl -X PATCH 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"title":"Entregable 2 · backend y front","dueAt":"2026-11-27T09:21:26.983Z"}'
+HTTP 200
+{
+  "activity": {
+    "owner": "6b083256a2eb6ec268e1a55a",
+    "title": "Entregable 2 · backend y front",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-27T09:21:26.983Z",
+    "status": "pendiente",
+    "steps": [
+      {
+        "text": "Leer la rúbrica",
+        "estimateMin": 15,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a55e"
+      },
+      {
+        "text": "Programar endpoints",
+        "estimateMin": 60,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a55f"
+      },
+      {
+        "text": "Escribir el reporte",
+        "estimateMin": 40,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a560"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:26.710Z",
+    "updatedAt": "2026-11-26T13:21:27.003Z",
+    "id": "6b083256a2eb6ec268e1a55d",
+    "urgency": "critica",
+    "remainingMin": 115,
+    "progress": {
+      "done": 0,
+      "total": 3
+    }
+  }
+}
+
+=== 4 · F4 · Agregar un paso (201)
+$ curl -X POST 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d/steps' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"text":"Revisar ortografía","estimateMin":10}'
+HTTP 201
+{
+  "activity": {
+    "owner": "6b083256a2eb6ec268e1a55a",
+    "title": "Entregable 2 · backend y front",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-27T09:21:26.983Z",
+    "status": "pendiente",
+    "steps": [
+      {
+        "text": "Leer la rúbrica",
+        "estimateMin": 15,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a55e"
+      },
+      {
+        "text": "Programar endpoints",
+        "estimateMin": 60,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a55f"
+      },
+      {
+        "text": "Escribir el reporte",
+        "estimateMin": 40,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a560"
+      },
+      {
+        "text": "Revisar ortografía",
+        "estimateMin": 10,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083257a2eb6ec268e1a56b"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:26.710Z",
+    "updatedAt": "2026-11-26T13:21:27.091Z",
+    "id": "6b083256a2eb6ec268e1a55d",
+    "urgency": "critica",
+    "remainingMin": 125,
+    "progress": {
+      "done": 0,
+      "total": 4
+    }
+  }
+}
+
+=== 4 · F4 · Quitar un paso (200)
+$ curl -X DELETE 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d/steps/6b083256a2eb6ec268e1a55e' -H 'Authorization: Bearer <TOKEN>'
+HTTP 200
+{
+  "activity": {
+    "owner": "6b083256a2eb6ec268e1a55a",
+    "title": "Entregable 2 · backend y front",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-27T09:21:26.983Z",
+    "status": "pendiente",
+    "steps": [
+      {
+        "text": "Programar endpoints",
+        "estimateMin": 60,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a55f"
+      },
+      {
+        "text": "Escribir el reporte",
+        "estimateMin": 40,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a560"
+      },
+      {
+        "text": "Revisar ortografía",
+        "estimateMin": 10,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083257a2eb6ec268e1a56b"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:26.710Z",
+    "updatedAt": "2026-11-26T13:21:27.179Z",
+    "id": "6b083256a2eb6ec268e1a55d",
+    "urgency": "critica",
+    "remainingMin": 110,
+    "progress": {
+      "done": 0,
+      "total": 3
+    }
+  }
+}
+
+=== 5 · F4 · Marcar como entregada con pasos pendientes (409)
+$ curl -X PATCH 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"status":"entregada"}'
+HTTP 409
+{
+  "error": {
+    "message": "Faltan 3 paso(s) por completar"
+  }
+}
+
+=== 6 · Consultar la actividad para obtener sus pasos
+$ curl -X GET 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d' -H 'Authorization: Bearer <TOKEN>'
+HTTP 200
+{
+  "activity": {
+    "owner": "6b083256a2eb6ec268e1a55a",
+    "title": "Entregable 2 · backend y front",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-27T09:21:26.983Z",
+    "status": "pendiente",
+    "steps": [
+      {
+        "text": "Programar endpoints",
+        "estimateMin": 60,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a55f"
+      },
+      {
+        "text": "Escribir el reporte",
+        "estimateMin": 40,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a560"
+      },
+      {
+        "text": "Revisar ortografía",
+        "estimateMin": 10,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083257a2eb6ec268e1a56b"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:26.710Z",
+    "updatedAt": "2026-11-26T13:21:27.179Z",
+    "id": "6b083256a2eb6ec268e1a55d",
+    "urgency": "critica",
+    "remainingMin": 110,
+    "progress": {
+      "done": 0,
+      "total": 3
+    }
+  }
+}
+
+=== 6 · Marcar paso como hecho (200)
+$ curl -X PATCH 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d/steps/6b083256a2eb6ec268e1a55f' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"done":true}'
+HTTP 200
+{
+  "activity": {
+    "owner": "6b083256a2eb6ec268e1a55a",
+    "title": "Entregable 2 · backend y front",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-27T09:21:26.983Z",
+    "status": "en_curso",
+    "steps": [
+      {
+        "text": "Programar endpoints",
+        "estimateMin": 60,
+        "done": true,
+        "doneAt": "2026-11-26T13:21:27.497Z",
+        "id": "6b083256a2eb6ec268e1a55f"
+      },
+      {
+        "text": "Escribir el reporte",
+        "estimateMin": 40,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083256a2eb6ec268e1a560"
+      },
+      {
+        "text": "Revisar ortografía",
+        "estimateMin": 10,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083257a2eb6ec268e1a56b"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:26.710Z",
+    "updatedAt": "2026-11-26T13:21:27.497Z",
+    "id": "6b083256a2eb6ec268e1a55d",
+    "urgency": "critica",
+    "remainingMin": 50,
+    "progress": {
+      "done": 1,
+      "total": 3
+    }
+  }
+}
+
+=== 6 · Marcar paso como hecho (200)
+$ curl -X PATCH 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d/steps/6b083256a2eb6ec268e1a560' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"done":true}'
+HTTP 200
+{
+  "activity": {
+    "owner": "6b083256a2eb6ec268e1a55a",
+    "title": "Entregable 2 · backend y front",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-27T09:21:26.983Z",
+    "status": "en_curso",
+    "steps": [
+      {
+        "text": "Programar endpoints",
+        "estimateMin": 60,
+        "done": true,
+        "doneAt": "2026-11-26T13:21:27.497Z",
+        "id": "6b083256a2eb6ec268e1a55f"
+      },
+      {
+        "text": "Escribir el reporte",
+        "estimateMin": 40,
+        "done": true,
+        "doneAt": "2026-11-26T13:21:27.591Z",
+        "id": "6b083256a2eb6ec268e1a560"
+      },
+      {
+        "text": "Revisar ortografía",
+        "estimateMin": 10,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083257a2eb6ec268e1a56b"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:26.710Z",
+    "updatedAt": "2026-11-26T13:21:27.591Z",
+    "id": "6b083256a2eb6ec268e1a55d",
+    "urgency": "critica",
+    "remainingMin": 10,
+    "progress": {
+      "done": 2,
+      "total": 3
+    }
+  }
+}
+
+=== 6 · Marcar paso como hecho (200)
+$ curl -X PATCH 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d/steps/6b083257a2eb6ec268e1a56b' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"done":true}'
+HTTP 200
+{
+  "activity": {
+    "owner": "6b083256a2eb6ec268e1a55a",
+    "title": "Entregable 2 · backend y front",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-27T09:21:26.983Z",
+    "status": "lista",
+    "steps": [
+      {
+        "text": "Programar endpoints",
+        "estimateMin": 60,
+        "done": true,
+        "doneAt": "2026-11-26T13:21:27.497Z",
+        "id": "6b083256a2eb6ec268e1a55f"
+      },
+      {
+        "text": "Escribir el reporte",
+        "estimateMin": 40,
+        "done": true,
+        "doneAt": "2026-11-26T13:21:27.591Z",
+        "id": "6b083256a2eb6ec268e1a560"
+      },
+      {
+        "text": "Revisar ortografía",
+        "estimateMin": 10,
+        "done": true,
+        "doneAt": "2026-11-26T13:21:27.683Z",
+        "id": "6b083257a2eb6ec268e1a56b"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:26.710Z",
+    "updatedAt": "2026-11-26T13:21:27.683Z",
+    "id": "6b083256a2eb6ec268e1a55d",
+    "urgency": "critica",
+    "remainingMin": 0,
+    "progress": {
+      "done": 3,
+      "total": 3
+    }
+  }
+}
+
+=== 6 · F4 · Marcar como entregada con todos los pasos hechos (200)
+$ curl -X PATCH 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"status":"entregada"}'
+HTTP 200
+{
+  "activity": {
+    "owner": "6b083256a2eb6ec268e1a55a",
+    "title": "Entregable 2 · backend y front",
+    "course": "Tecnologías en el servidor",
+    "brief": null,
+    "dueAt": "2026-11-27T09:21:26.983Z",
+    "status": "entregada",
+    "steps": [
+      {
+        "text": "Programar endpoints",
+        "estimateMin": 60,
+        "done": true,
+        "doneAt": "2026-11-26T13:21:27.497Z",
+        "id": "6b083256a2eb6ec268e1a55f"
+      },
+      {
+        "text": "Escribir el reporte",
+        "estimateMin": 40,
+        "done": true,
+        "doneAt": "2026-11-26T13:21:27.591Z",
+        "id": "6b083256a2eb6ec268e1a560"
+      },
+      {
+        "text": "Revisar ortografía",
+        "estimateMin": 10,
+        "done": true,
+        "doneAt": "2026-11-26T13:21:27.683Z",
+        "id": "6b083257a2eb6ec268e1a56b"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:26.710Z",
+    "updatedAt": "2026-11-26T13:21:27.772Z",
+    "id": "6b083256a2eb6ec268e1a55d",
+    "urgency": "critica",
+    "remainingMin": 0,
+    "progress": {
+      "done": 3,
+      "total": 3
+    }
+  }
+}
+
+=== 6 · F4 · Intentar editar una actividad entregada (409)
+$ curl -X PATCH 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"title":"Cambio tardío"}'
+HTTP 409
+{
+  "error": {
+    "message": "La actividad está cerrada y no se puede modificar"
+  }
+}
+
+=== 7 · F5 · Crear otra actividad abierta para el resumen (201)
+$ curl -X POST 'http://localhost:3000/api/activities' -H 'Authorization: Bearer <TOKEN>' -H 'Content-Type: application/json' -d '{"title":"Lectura de Bioética","course":"Bioética","dueAt":"2026-11-28T13:21:27.987Z","steps":[{"text":"Leer capítulo 3","estimateMin":25},{"text":"Hacer resumen","estimateMin":20}]}'
+HTTP 201
+{
+  "activity": {
+    "owner": "6b083256a2eb6ec268e1a55a",
+    "title": "Lectura de Bioética",
+    "course": "Bioética",
+    "brief": null,
+    "dueAt": "2026-11-28T13:21:27.987Z",
+    "status": "pendiente",
+    "steps": [
+      {
+        "text": "Leer capítulo 3",
+        "estimateMin": 25,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083258a2eb6ec268e1a594"
+      },
+      {
+        "text": "Hacer resumen",
+        "estimateMin": 20,
+        "done": false,
+        "doneAt": null,
+        "id": "6b083258a2eb6ec268e1a595"
+      }
+    ],
+    "createdAt": "2026-11-26T13:21:28.002Z",
+    "updatedAt": "2026-11-26T13:21:28.002Z",
+    "id": "6b083258a2eb6ec268e1a593",
+    "urgency": "pronto",
+    "remainingMin": 45,
+    "progress": {
+      "done": 0,
+      "total": 2
+    }
+  }
+}
+
+=== 7 · F5 · Resumen de carga (200)
+$ curl -X GET 'http://localhost:3000/api/summary' -H 'Authorization: Bearer <TOKEN>'
+HTTP 200
+{
+  "total": 2,
+  "open": 1,
+  "byStatus": {
+    "pendiente": 1,
+    "en_curso": 0,
+    "lista": 0,
+    "entregada": 1,
+    "cancelada": 0
+  },
+  "byUrgency": {
+    "vencida": 0,
+    "critica": 0,
+    "pronto": 1,
+    "holgada": 0,
+    "sin_fecha": 0
+  },
+  "pendingSteps": 2,
+  "remainingMin": 45,
+  "nextDue": {
+    "id": "6b083258a2eb6ec268e1a593",
+    "title": "Lectura de Bioética",
+    "dueAt": "2026-11-28T13:21:27.987Z",
+    "urgency": "pronto"
+  }
+}
+
+=== 8 · F4 · Eliminar la actividad entregada (204)
+$ curl -X DELETE 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d' -H 'Authorization: Bearer <TOKEN>'
+HTTP 204
+(sin cuerpo)
+
+=== 8 · F4 · Consultar la actividad eliminada (404)
+$ curl -X GET 'http://localhost:3000/api/activities/6b083256a2eb6ec268e1a55d' -H 'Authorization: Bearer <TOKEN>'
+HTTP 404
+{
+  "error": {
+    "message": "Actividad no encontrada"
+  }
+}
+
+--- 9 · F6 · 6 logins fallidos seguidos (límite del servidor: RATE_LIMIT_MAX=5)
+
+=== 9 · F6 · Login fallido #1
+$ curl -X POST 'http://localhost:3000/api/auth/login' -H 'Content-Type: application/json' -d '{"email":"demo2-1795699286@example.com","password":"incorrecta-1"}'
+HTTP 401
+{
+  "error": {
+    "message": "Credenciales inválidas"
+  }
+}
+
+=== 9 · F6 · Login fallido #2
+$ curl -X POST 'http://localhost:3000/api/auth/login' -H 'Content-Type: application/json' -d '{"email":"demo2-1795699286@example.com","password":"incorrecta-2"}'
+HTTP 401
+{
+  "error": {
+    "message": "Credenciales inválidas"
+  }
+}
+
+=== 9 · F6 · Login fallido #3
+$ curl -X POST 'http://localhost:3000/api/auth/login' -H 'Content-Type: application/json' -d '{"email":"demo2-1795699286@example.com","password":"incorrecta-3"}'
+HTTP 401
+{
+  "error": {
+    "message": "Credenciales inválidas"
+  }
+}
+
+=== 9 · F6 · Login fallido #4
+$ curl -X POST 'http://localhost:3000/api/auth/login' -H 'Content-Type: application/json' -d '{"email":"demo2-1795699286@example.com","password":"incorrecta-4"}'
+HTTP 401
+{
+  "error": {
+    "message": "Credenciales inválidas"
+  }
+}
+
+=== 9 · F6 · Login fallido #5
+$ curl -X POST 'http://localhost:3000/api/auth/login' -H 'Content-Type: application/json' -d '{"email":"demo2-1795699286@example.com","password":"incorrecta-5"}'
+HTTP 401
+{
+  "error": {
+    "message": "Credenciales inválidas"
+  }
+}
+
+=== 9 · F6 · Login fallido #6
+$ curl -X POST 'http://localhost:3000/api/auth/login' -H 'Content-Type: application/json' -d '{"email":"demo2-1795699286@example.com","password":"incorrecta-6"}'
+HTTP 429
+Retry-After: 898
+{
+  "error": {
+    "message": "Demasiados intentos. Intenta de nuevo en 15 minuto(s)."
+  }
+}
+
+Listo.

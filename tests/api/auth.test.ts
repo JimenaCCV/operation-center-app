@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import request from "supertest";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import { app, bearer, createAdminAndLogin, registerAndLogin, setupDb, teardownDb, uniqueEmail } from "./helpers";
 
 beforeAll(setupDb);
@@ -13,7 +13,7 @@ describe("POST /api/auth/register", () => {
       .send({ name: "Jimena", email: "Jimena@Example.com", password: "contrasena-1" });
     expect(res.status).toBe(201);
     expect(res.body.user).toMatchObject({ name: "Jimena", email: "jimena@example.com", role: "user" });
-    expect(res.body.user.id).toBeTypeOf("string");
+    expect(typeof res.body.user.id).toBe("string");
     expect(JSON.stringify(res.body)).not.toMatch(/passwordHash|contrasena-1/);
   });
 

@@ -5,7 +5,9 @@ const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3000),
   MONGODB_URI: z.string().min(1).default("mongodb://127.0.0.1:27017/op-jccv"),
-  JWT_SECRET: z.string().min(16, "JWT_SECRET debe tener al menos 16 caracteres"),
+  JWT_SECRET: z
+    .string({ required_error: "Falta JWT_SECRET (cópialo de .env.example y cambia el valor)" })
+    .min(16, "JWT_SECRET debe tener al menos 16 caracteres"),
   JWT_EXPIRES_IN: z.string().default("1h"),
   BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(10),
   // Límite de intentos en /auth/login (solo fallidos) y /auth/register, por IP.

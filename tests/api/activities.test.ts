@@ -1,5 +1,5 @@
 import request from "supertest";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import { app, bearer, registerAndLogin, setupDb, teardownDb } from "./helpers";
 
 beforeAll(setupDb);
@@ -27,7 +27,7 @@ describe("POST /api/activities", () => {
     expect(a.progress).toEqual({ done: 0, total: 2 });
     expect(a.steps).toHaveLength(2);
     expect(a.steps[1]).toMatchObject({ text: "Escribir README", estimateMin: 15, done: false });
-    expect(a.steps[0].id).toBeTypeOf("string");
+    expect(typeof a.steps[0].id).toBe("string");
     expect(a).not.toHaveProperty("dueSort");
   });
 
@@ -40,6 +40,13 @@ describe("POST /api/activities", () => {
     expect((await createActivity(token, { title: "" })).status).toBe(400);
     expect((await createActivity(token, { title: "A", dueAt: "no-es-fecha" })).status).toBe(400);
     expect((await createActivity(token, { title: "A", steps: [{ text: "" }] })).status).toBe(400);
+  });
+
+  it("dueAt booleano o arreglo → 400 (antes se guardaba como 1970-01-01)", async () => {
+    const { token } = await registerAndLogin();
+    for (const dueAt of [true, false, ["2026-12-01"]]) {
+      expect((await createActivity(token, { title: "x", dueAt })).status).toBe(400);
+    }
   });
 
   it("el dueño siempre es quien tiene el token, aunque mande otro owner en el body", async () => {
@@ -87,7 +94,7 @@ describe("PATCH /api/activities/:id/steps/:stepId", () => {
     const first = await request(app).patch(`/api/activities/${id}/steps/${steps[0].id}`).set(bearer(token)).send({ done: true });
     expect(first.status).toBe(200);
     expect(first.body.activity).toMatchObject({ status: "en_curso", remainingMin: 20, progress: { done: 1, total: 2 } });
-    expect(first.body.activity.steps[0].doneAt).toBeTypeOf("string");
+    expect(typeof first.body.activity.steps[0].doneAt).toBe("string");
 
     const second = await request(app).patch(`/api/activities/${id}/steps/${steps[1].id}`).set(bearer(token)).send({ done: true });
     expect(second.body.activity).toMatchObject({ status: "lista", remainingMin: 0 });

@@ -1,5 +1,5 @@
 import request from "supertest";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
 import { app, bearer, registerAndLogin, setupDb, teardownDb } from "./helpers";
 
 beforeAll(setupDb);

@@ -1,6 +1,6 @@
 import express from "express";
 import request from "supertest";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@jest/globals";
 import { errorHandler } from "../../src/middleware/error.middleware";
 import { createAuthLimiter } from "../../src/middleware/rate-limit.middleware";
 import { HttpError } from "../../src/utils/httpError";
